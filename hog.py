@@ -4,7 +4,9 @@ import unittests
 
 # Returns a function that acts as rolling a dice of the specified sides
 def dice(sides):
-    return lambda: random.randrange(1, sides+1, step=1)
+    func = lambda: random.randrange(1, sides+1, step=1)
+    func.__name__ = f"d{sides}"
+    return func
 
 d4 = dice(4)
 d6 = dice(6)
@@ -93,7 +95,7 @@ def play(strat0, strat1, score0=0, score1=0, start_dice=d6, goal=100):
     while winner not in [0, 1]:
         if current_player == 0:
             # Pick number of dice based on strategy
-            num_dice = strat0(score0, score1, turn_num, trot)
+            num_dice = strat0(score0, score1, turn_num, trot, current_dice.__name__)
 
             # Find if dice chosen results in trot
             trot = time_trot(num_dice, turn_num, trot)
@@ -109,7 +111,7 @@ def play(strat0, strat1, score0=0, score1=0, start_dice=d6, goal=100):
             next_player = next_turn_player(current_player, more_boar(score0, score1), trot)
         else:
             # Pick number of dice based on strategy
-            num_dice = strat1(score1, score0, turn_num, trot)
+            num_dice = strat1(score1, score0, turn_num, trot, current_dice.__name__)
 
             # Find if dice chosen results in trot
             trot = time_trot(num_dice, turn_num, trot)
@@ -134,12 +136,13 @@ def play(strat0, strat1, score0=0, score1=0, start_dice=d6, goal=100):
         # Set next player
         current_player = next_player
 
-        print(f"Player0 score is {score0} and Player1 score is {score1}. Next player is {current_player}")
+        #print(f"Player0 score is {score0} and Player1 score is {score1}. Next player is {current_player}. Current dice is {current_dice.__name__}")
 
         # Determine if anyone has won
         winner = has_won(score0, score1, goal)
     
-    print(f"Winner is: {winner}.")
+    #print(f"Winner is: {winner}.")
+    return winner
 
 # Returns the winner based on scores. None if no one wins.
 def has_won(score0, score1, goal):
@@ -150,13 +153,11 @@ def has_won(score0, score1, goal):
     else:
         return None
 
-def strat_rand(score0, score1, turn_num, trot):
+def strat_rand(score0, score1, turn_num, trot, dice):
     return random.randrange(0, 10+1, step=1)
 
-def strat_six(score0, score1, turn_num, trot):
+def strat_six(score0, score1, turn_num, trot, dice):
     return 6
 
-tests = unittest.TestLoader().loadTestsFromModule(unittests)
-unittest.TextTestRunner(verbosity=2).run(tests)
-
-play(strat_rand, strat_six)
+#tests = unittest.TestLoader().loadTestsFromModule(unittests)
+#unittest.TextTestRunner(verbosity=2).run(tests)
