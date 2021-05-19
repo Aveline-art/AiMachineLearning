@@ -1,40 +1,45 @@
-from play import *
+from train import *
 import hog
 import json
+import pprint as pp
 
 q = dict()
 
-with open("q.txt", "r") as file:
+with open("q2.txt", "r") as file:
     dicti = json.loads(file.read())
     for key, value in dicti.items():
+        if key == '(None, None)':
+            continue
         new_key = key.split(',')
         a = int(new_key[0][2:])
-        b = int(new_key[1][1:])
-        c = int(new_key[2][1:])
-        d = False if new_key[3][1:] == 'False' else True
-        e = new_key[4][2:-2]
-        f = int(new_key[5][1:-1])
-        q[((a, b, c, d, e), f)] = value
+        b = int(new_key[1][1:-1])
+        d = int(new_key[2][1:-1])
+        q[((a, b), d)] = value
 
-ai = train(100000, q)
+def speak(x):
+    if x % 10000 == 0:
+        print(f"Now on game {x/10000}")
 
-def ai_strat(score0, score1, turn_num, trot, dice):
-    return ai.make_best_move((score0, score1, turn_num, trot, dice))
+ai = train(0, q, speak)
+
+def ai_strat(player_score, opp_score, dice):
+    return ai.make_best_move((player_score, opp_score))
 
 score = {
     0: 0,
     1: 0,
 }
 
-for i in range(100):
+for i in range(1000):
     #print(f"playing game #{i}")
-    winner = hog.play(hog.strat_rand, ai_strat)
-    score[winner] = score[winner] + 1
+    score0, score1 = hog.play(ai_strat, hog.strat_rand)
+    player = winner(score0, score1, 100)
+    score[player] = score[player] + 1
 
-with open("q.txt", "w") as file:
+print(score)
+'''
+with open("q2.txt", "w") as file:
     new_dict = dict()
     for key, value in ai.q.items():
         new_dict[str(key)] = value
-    file.write(json.dumps(new_dict))
-    
-print(score)
+    file.write(json.dumps(new_dict))'''
