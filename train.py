@@ -1,9 +1,8 @@
 from hog import *
 from hog_ai import *
+import random
 
-def train(num_games, q, say):
-    ai = HogAI()
-    ai.q = q
+def train(ai, num_games, say=lambda x: None):
 
     def ai_strat(player_score, opp_score, dice):
         return ai.make_move((player_score, opp_score))
@@ -92,6 +91,25 @@ def train(num_games, q, say):
                 ai.update(start_state, end_state, num_dice, 0)
             
     return ai
+
+def test(num_games, ai, strat):
+    def ai_strat(player_score, opp_score, dice):
+        return ai.make_best_move((player_score, opp_score))
+    
+    score = 0
+
+    for i in range(num_games):
+        ai_first = random.choice([True, False])
+        if ai_first:
+            score0, score1 = play(ai_strat, strat)
+            player = winner(score0, score1, 100)
+            score += 1 if player == 0 else 0
+        else:
+            score0, score1 = play(strat, ai_strat)
+            player = winner(score0, score1, 100)
+            score += 1 if player == 1 else 0
+    
+    return score / num_games
     
 
 

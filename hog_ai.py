@@ -4,8 +4,8 @@ import random
 class HogAI():
     actions = [i for i in range(11)]
 
-    def __init__(self, alpha=0.5, epsilon=0.1) -> None:
-        self.q = dict()
+    def __init__(self, q=dict(), alpha=0.5, epsilon=0.1) -> None:
+        self.q = q
         self.alpha = alpha
         self.epsilon = epsilon
     
